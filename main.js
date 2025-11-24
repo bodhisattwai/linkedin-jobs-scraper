@@ -1,8 +1,8 @@
 const Apify = require('apify');
-const { log } = Apify.utils;
 
 // Production-ready LinkedIn scraper with anti-detection measures
 Apify.main(async () => {
+    const { log } = Apify.utils;
     const input = await Apify.getInput();
     
     // Configuration with defaults
