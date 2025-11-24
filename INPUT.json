@@ -1,0 +1,23 @@
+{
+  "searchQueries": [
+    "Software Engineer",
+    "Senior Software Engineer",
+    "Full Stack Developer"
+  ],
+  "location": "United States",
+  "maxResults": 100,
+  "maxConcurrency": 2,
+  "minDelayBetweenRequests": 2000,
+  "maxDelayBetweenRequests": 5000,
+  "proxyConfiguration": {
+    "useApifyProxy": true
+  },
+  "customData": {
+    "campaignId": "tech-jobs-2024",
+    "purpose": "Market Research & Hiring Analysis",
+    "dataCollectionDate": "2024-11-24"
+  },
+  "linkedinCookies": null,
+  "debugMode": false,
+  "extendOutputFunction": "async (job, page, request) => {\n    // Extract experience level from description\n    const description = job.description.toLowerCase();\n    \n    if (description.includes('senior') || description.includes('sr.') || description.includes('10+')) {\n        job.experienceLevel = 'Senior (5+ years)';\n    } else if (description.includes('junior') || description.includes('entry level') || description.includes('0-2')) {\n        job.experienceLevel = 'Entry Level (0-2 years)';\n    } else if (description.includes('mid-level') || description.includes('mid level') || description.includes('3-5')) {\n        job.experienceLevel = 'Mid-Level (3-5 years)';\n    } else {\n        job.experienceLevel = 'Not Specified';\n    }\n    \n    // Extract remote work information\n    job.isRemote = description.includes('remote') || description.includes('work from home') || description.includes('distributed');\n    job.isHybrid = description.includes('hybrid') || description.includes('flexible');\n    \n    // Extract salary if available\n    const salaryMatch = description.match(/\\$([0-9,]+)\\s*-?\\s*\\$?([0-9,]*)/i);\n    job.salaryExtracted = salaryMatch ? salaryMatch[0] : null;\n    \n    // Count key technologies if mentioned\n    const techStack = ['Python', 'JavaScript', 'Java', 'React', 'Node.js', 'AWS', 'Docker', 'Kubernetes', 'SQL', 'PostgreSQL'];\n    job.technologiesFound = techStack.filter(tech => description.includes(tech));\n    \n    return job;\n}"
+}

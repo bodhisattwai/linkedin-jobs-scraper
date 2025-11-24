@@ -1,0 +1,17 @@
+{
+  "actorSpecification": 1,
+  "name": "linkedin-jobs-scraper",
+  "title": "LinkedIn Jobs Scraper",
+  "description": "Advanced scraper for LinkedIn job listings with detailed job information extraction",
+  "version": "1.0.0",
+  "meta": {
+    "templateId": "js-cheerio-crawler"
+  },
+  "input": "./input_schema.json",
+  "dockerfile": "./Dockerfile",
+  "readme": "./README.md",
+  "storages": {
+    "dataset": "./dataset_schema.json",
+    "keyValueStore": "./key_value_store_schema.json"
+  }
+}

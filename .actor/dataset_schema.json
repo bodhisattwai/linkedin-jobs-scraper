@@ -1,0 +1,81 @@
+{
+  "title": "LinkedIn Jobs Dataset",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "url": {
+      "title": "Job URL",
+      "type": "string",
+      "description": "Direct URL to the job posting"
+    },
+    "title": {
+      "title": "Job Title",
+      "type": "string",
+      "description": "Title of the job position"
+    },
+    "company": {
+      "title": "Company Name",
+      "type": "string",
+      "description": "Name of the hiring company"
+    },
+    "location": {
+      "title": "Job Location",
+      "type": "string",
+      "description": "Geographic location of the job"
+    },
+    "description": {
+      "title": "Job Description",
+      "type": "string",
+      "description": "Full job description and requirements"
+    },
+    "postedDate": {
+      "title": "Posted Date",
+      "type": "string",
+      "description": "When the job was posted"
+    },
+    "applicants": {
+      "title": "Number of Applicants",
+      "type": "string",
+      "description": "Number of people who applied"
+    },
+    "salary": {
+      "title": "Salary Information",
+      "type": "string",
+      "description": "Salary range or compensation details"
+    },
+    "requirements": {
+      "title": "Job Requirements",
+      "type": "array",
+      "description": "List of job requirements and qualifications",
+      "items": {
+        "type": "string"
+      }
+    },
+    "companySize": {
+      "title": "Company Size",
+      "type": "string",
+      "description": "Number of employees in the company"
+    },
+    "companyIndustry": {
+      "title": "Company Industry",
+      "type": "string",
+      "description": "Industry sector of the company"
+    },
+    "searchQuery": {
+      "title": "Search Query",
+      "type": "string",
+      "description": "Search query used to find this job"
+    },
+    "scrapedAt": {
+      "title": "Scraped At",
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the job was scraped"
+    },
+    "customData": {
+      "title": "Custom Data",
+      "type": "object",
+      "description": "Additional custom data"
+    }
+  }
+}

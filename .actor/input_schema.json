@@ -1,0 +1,65 @@
+{
+  "title": "LinkedIn Jobs Scraper",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "searchQueries": {
+      "title": "Search Queries",
+      "type": "array",
+      "description": "List of job titles or keywords to search for",
+      "editor": "stringList",
+      "prefill": ["Software Engineer", "Data Scientist"],
+      "default": ["Software Engineer"]
+    },
+    "location": {
+      "title": "Location",
+      "type": "string",
+      "description": "Location to search jobs in (country, city, or region)",
+      "editor": "textfield",
+      "prefill": "United States",
+      "default": "United States"
+    },
+    "maxResults": {
+      "title": "Maximum Results",
+      type: "integer",
+      "description": "Maximum number of jobs to scrape",
+      "editor": "number",
+      "default": 100,
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "maxConcurrency": {
+      "title": "Maximum Concurrency",
+      "type": "integer",
+      "description": "Number of concurrent requests",
+      "editor": "number",
+      "default": 5,
+      "minimum": 1,
+      "maximum": 10
+    },
+    "proxyConfiguration": {
+      "title": "Proxy Configuration",
+      "type": "object",
+      "description": "Proxy settings for the scraper",
+      "editor": "proxy",
+      "default": {
+        "useApifyProxy": true
+      }
+    },
+    "extendOutputFunction": {
+      "title": "Custom Output Function",
+      "type": "string",
+      "description": "Custom JavaScript function to extend output. Function receives (job, $, request) parameters.",
+      "editor": "javascript",
+      "default": ""
+    },
+    "customData": {
+      "title": "Custom Data",
+      "type": "object",
+      "description": "Custom data to include with each job record",
+      "editor": "json",
+      "default": {}
+    }
+  },
+  "required": ["searchQueries"]
+}

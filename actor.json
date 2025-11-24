@@ -1,0 +1,212 @@
+{
+  "actorSpecification": 2,
+  "name": "linkedin-jobs-scraper",
+  "title": "LinkedIn Jobs Scraper - Advanced Edition",
+  "description": "Production-ready actor for scraping comprehensive job listings from LinkedIn including detailed job information and hiring team/recruiter details. Features anti-detection measures, residential proxy support, and hiring manager extraction.",
+  "version": "2.0.0",
+  "buildTag": "latest",
+  "env": {
+    "APIFY_MEMORY_MBYTES": 2048
+  },
+  "input": {
+    "title": "LinkedIn Jobs Scraper Input",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+      "searchQueries": {
+        "title": "Search Queries",
+        "description": "Array of job titles, keywords, or skills to search for (e.g., ['Software Engineer', 'Data Scientist'])",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "default": ["Software Engineer"],
+        "minItems": 1,
+        "example": ["Senior Software Engineer", "Product Manager", "UX Designer"]
+      },
+      "location": {
+        "title": "Location",
+        "description": "Geographic location for job search. Use country name or city name (e.g., 'United States', 'United Kingdom', 'San Francisco')",
+        "type": "string",
+        "default": "United States",
+        "example": "San Francisco, CA"
+      },
+      "maxResults": {
+        "title": "Maximum Results",
+        "description": "Maximum number of job listings to scrape. Helps control scraping scope and cost.",
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000,
+        "default": 100,
+        "example": 50
+      },
+      "maxConcurrency": {
+        "title": "Max Concurrency",
+        "description": "Maximum number of concurrent requests. LinkedIn requires LOW concurrency (1-2 recommended). Higher values may result in IP blocking.",
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5,
+        "default": 2,
+        "example": 2
+      },
+      "minDelayBetweenRequests": {
+        "title": "Min Delay Between Requests (ms)",
+        "description": "Minimum delay in milliseconds between requests to avoid detection. Simulates human behavior.",
+        "type": "integer",
+        "minimum": 1000,
+        "default": 2000
+      },
+      "maxDelayBetweenRequests": {
+        "title": "Max Delay Between Requests (ms)",
+        "description": "Maximum delay in milliseconds between requests.",
+        "type": "integer",
+        "minimum": 1000,
+        "default": 5000
+      },
+      "proxyConfiguration": {
+        "title": "Proxy Configuration",
+        "description": "Proxy settings for the scraper. Set useApifyProxy to true to use Apify's proxy service, or provide custom proxy URLs.",
+        "type": "object",
+        "default": { "useApifyProxy": true },
+        "properties": {
+          "useApifyProxy": {
+            "title": "Use Apify Proxy",
+            "description": "Use Apify's proxy service. Recommended: use residential proxies for LinkedIn.",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "linkedinCookies": {
+        "title": "LinkedIn Session Cookies (Optional)",
+        "description": "JSON-formatted LinkedIn session cookies for authenticated scraping. Improves success rate and access to more job details. Format: JSON string of cookie array.",
+        "type": "string",
+        "example": "[{\"name\":\"li_at\",\"value\":\"YOUR_COOKIE_VALUE\"},{\"name\":\"JSESSIONID\",\"value\":\"YOUR_SESSION_VALUE\"}]"
+      },
+      "customData": {
+        "title": "Custom Data",
+        "description": "Custom metadata to include with each scraped job record (e.g., campaign ID, purpose of scraping)",
+        "type": "object",
+        "default": {},
+        "example": {
+          "campaignId": "market-research-2024",
+          "purpose": "Competitive Analysis"
+        }
+      },
+      "extendOutputFunction": {
+        "title": "Extend Output Function",
+        "description": "Custom JavaScript function to extend and transform job output data. Function receives (job, page, request) and must return modified job object.",
+        "type": "string",
+        "example": "async (job, page, request) => { job.scraperVersion = '2.0.0'; return job; }"
+      },
+      "debugMode": {
+        "title": "Debug Mode",
+        "description": "Enable detailed logging for debugging and monitoring.",
+        "type": "boolean",
+        "default": false
+      }
+    },
+    "required": ["searchQueries", "location"]
+  },
+  "output": {
+    "title": "LinkedIn Job Listing Output",
+    "description": "Detailed job listing information including hiring team details",
+    "type": "object",
+    "properties": {
+      "url": {
+        "type": "string",
+        "description": "Direct URL to the LinkedIn job posting"
+      },
+      "title": {
+        "type": "string",
+        "description": "Job title"
+      },
+      "company": {
+        "type": "string",
+        "description": "Company name hiring for this position"
+      },
+      "location": {
+        "type": "string",
+        "description": "Job location"
+      },
+      "locationType": {
+        "type": "string",
+        "description": "Type of work location (On-site, Remote, Hybrid)"
+      },
+      "employmentType": {
+        "type": "string",
+        "description": "Employment type (Full-time, Part-time, Contract, etc.)"
+      },
+      "seniority": {
+        "type": "string",
+        "description": "Seniority level required (Entry-level, Mid-level, Senior, Executive)"
+      },
+      "salary": {
+        "type": "string",
+        "description": "Salary range if available"
+      },
+      "description": {
+        "type": "string",
+        "description": "Full job description text"
+      },
+      "jobCriteria": {
+        "type": "array",
+        "description": "List of job criteria/requirements extracted from the listing"
+      },
+      "postedDate": {
+        "type": "string",
+        "description": "When the job was posted (e.g., '2 weeks ago')"
+      },
+      "hiringTeam": {
+        "type": "array",
+        "description": "List of hiring team members/recruiters with their details",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the recruiter or hiring manager"
+            },
+            "title": {
+              "type": "string",
+              "description": "Job title/position of the recruiter"
+            },
+            "profileUrl": {
+              "type": "string",
+              "description": "LinkedIn profile URL of the recruiter"
+            }
+          }
+        }
+      },
+      "searchQuery": {
+        "type": "string",
+        "description": "The search query used to find this job"
+      },
+      "location_filter": {
+        "type": "string",
+        "description": "The location filter used in the search"
+      },
+      "scrapedAt": {
+        "type": "string",
+        "description": "ISO timestamp when the job was scraped"
+      },
+      "customData": {
+        "type": "object",
+        "description": "Custom metadata provided in input"
+      }
+    }
+  },
+  "categories": [
+    "PRODUCTIVITY",
+    "HUMAN RESOURCES"
+  ],
+  "isPublic": false,
+  "isDeprecated": false,
+  "dockerfile": "./Dockerfile",
+  "githubGithubUrl": "",
+  "author": {
+    "name": "Your Company",
+    "email": "support@yourcompany.com"
+  },
+  "documentation": "For detailed documentation and usage examples, see README.md"
+}
