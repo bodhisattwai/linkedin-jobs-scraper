@@ -1,5 +1,5 @@
 {
-  "actorSpecification": 2,
+  "actorSpecification": 1,
   "name": "linkedin-jobs-scraper",
   "title": "LinkedIn Jobs Scraper - Advanced Edition",
   "description": "Production-ready actor for scraping comprehensive job listings from LinkedIn including detailed job information and hiring team/recruiter details. Features anti-detection measures, residential proxy support, and hiring manager extraction.",
