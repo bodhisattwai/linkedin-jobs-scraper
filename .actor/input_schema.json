@@ -21,7 +21,7 @@
     },
     "maxResults": {
       "title": "Maximum Results",
-      type: "integer",
+      "type": "integer",
       "description": "Maximum number of jobs to scrape",
       "editor": "number",
       "default": 100,
@@ -33,9 +33,25 @@
       "type": "integer",
       "description": "Number of concurrent requests",
       "editor": "number",
-      "default": 5,
+      "default": 2,
       "minimum": 1,
-      "maximum": 10
+      "maximum": 5
+    },
+    "minDelayBetweenRequests": {
+      "title": "Min Delay Between Requests (ms)",
+      "type": "integer",
+      "description": "Minimum delay in milliseconds between requests to avoid detection",
+      "editor": "number",
+      "default": 2000,
+      "minimum": 1000
+    },
+    "maxDelayBetweenRequests": {
+      "title": "Max Delay Between Requests (ms)",
+      "type": "integer",
+      "description": "Maximum delay in milliseconds between requests",
+      "editor": "number",
+      "default": 5000,
+      "minimum": 1000
     },
     "proxyConfiguration": {
       "title": "Proxy Configuration",
@@ -46,10 +62,16 @@
         "useApifyProxy": true
       }
     },
+    "linkedinCookies": {
+      "title": "LinkedIn Session Cookies (Optional)",
+      "type": "string",
+      "description": "JSON-formatted LinkedIn session cookies for authenticated scraping",
+      "editor": "textarea"
+    },
     "extendOutputFunction": {
       "title": "Custom Output Function",
       "type": "string",
-      "description": "Custom JavaScript function to extend output. Function receives (job, $, request) parameters.",
+      "description": "Custom JavaScript function to extend output",
       "editor": "javascript",
       "default": ""
     },
@@ -59,7 +81,14 @@
       "description": "Custom data to include with each job record",
       "editor": "json",
       "default": {}
+    },
+    "debugMode": {
+      "title": "Debug Mode",
+      "type": "boolean",
+      "description": "Enable detailed logging for debugging",
+      "editor": "checkbox",
+      "default": false
     }
   },
-  "required": ["searchQueries"]
+  "required": ["searchQueries", "location"]
 }

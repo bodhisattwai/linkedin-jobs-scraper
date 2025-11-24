@@ -23,48 +23,69 @@
       "type": "string",
       "description": "Geographic location of the job"
     },
-    "description": {
-      "title": "Job Description",
+    "locationType": {
       "type": "string",
-      "description": "Full job description and requirements"
+      "description": "Type of work location (On-site, Remote, Hybrid)"
     },
-    "postedDate": {
-      "title": "Posted Date",
+    "employmentType": {
       "type": "string",
-      "description": "When the job was posted"
+      "description": "Employment type (Full-time, Part-time, Contract, etc.)"
     },
-    "applicants": {
-      "title": "Number of Applicants",
+    "seniority": {
       "type": "string",
-      "description": "Number of people who applied"
+      "description": "Seniority level required (Entry-level, Mid-level, Senior, Executive)"
     },
     "salary": {
       "title": "Salary Information",
       "type": "string",
       "description": "Salary range or compensation details"
     },
-    "requirements": {
-      "title": "Job Requirements",
+    "description": {
+      "title": "Job Description",
+      "type": "string",
+      "description": "Full job description and requirements"
+    },
+    "jobCriteria": {
       "type": "array",
-      "description": "List of job requirements and qualifications",
+      "description": "List of job criteria/requirements extracted from the listing",
       "items": {
         "type": "string"
       }
     },
-    "companySize": {
-      "title": "Company Size",
+    "postedDate": {
+      "title": "Posted Date",
       "type": "string",
-      "description": "Number of employees in the company"
+      "description": "When the job was posted"
     },
-    "companyIndustry": {
-      "title": "Company Industry",
-      "type": "string",
-      "description": "Industry sector of the company"
+    "hiringTeam": {
+      "type": "array",
+      "description": "List of hiring team members/recruiters with their details",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the recruiter or hiring manager"
+          },
+          "title": {
+            "type": "string",
+            "description": "Job title/position of the recruiter"
+          },
+          "profileUrl": {
+            "type": "string",
+            "description": "LinkedIn profile URL of the recruiter"
+          }
+        }
+      }
     },
     "searchQuery": {
       "title": "Search Query",
       "type": "string",
       "description": "Search query used to find this job"
+    },
+    "location_filter": {
+      "type": "string",
+      "description": "The location filter used in the search"
     },
     "scrapedAt": {
       "title": "Scraped At",
