@@ -1,10 +1,10 @@
-const Apify = require('apify');
+const { Actor } = require('apify');
+const { PlaywrightCrawler, createPlaywrightRouter, log } = require('crawlee');
 
 // Production-ready LinkedIn scraper with anti-detection measures
-(async () => {
+Actor.main(async () => {
     // Initialize Apify SDK by getting input first
-    const input = await Apify.getInput();
-    const { log } = Apify.utils;
+    const input = await Actor.getInput();
     
     // Configuration with defaults
     const {
@@ -31,9 +31,9 @@ const Apify = require('apify');
     }
 
     // Request queue and dataset
-    const requestQueue = await Apify.openRequestQueue();
-    const dataset = await Apify.openDataset();
-    const kvStore = await Apify.openKeyValueStore();
+    const requestQueue = await Actor.openRequestQueue();
+    const dataset = await Actor.openDataset();
+    const kvStore = await Actor.openKeyValueStore();
     
     // Track statistics
     const stats = {
@@ -47,7 +47,7 @@ const Apify = require('apify');
     // Random delay function for human-like behavior
     const randomDelay = async () => {
         const delay = Math.random() * (maxDelayBetweenRequests - minDelayBetweenRequests) + minDelayBetweenRequests;
-        await Apify.utils.sleep(delay);
+        await new Promise(resolve => setTimeout(resolve, delay));
     };
 
     // Generate realistic user agents
@@ -83,10 +83,10 @@ const Apify = require('apify');
     }
 
     // Create Playwright router with anti-detection
-    const router = Apify.createPlaywrightRouter();
+    const router = createPlaywrightRouter();
 
     // Search results handler
-    router.addHandler('SEARCH', async ({ page, request, enqueueLinks, crawler }) => {
+    router.addHandler('SEARCH', async ({ page, request, enqueueLinks }) => {
         log.info(`[SEARCH] Processing: ${request.url}`);
         
         try {
@@ -153,7 +153,7 @@ const Apify = require('apify');
             await page.evaluate(() => {
                 window.scrollBy(0, window.innerHeight);
             });
-            await Apify.utils.sleep(1000);
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
             // Extract basic job information
             const jobData = await page.evaluate(() => {
@@ -262,7 +262,7 @@ const Apify = require('apify');
     });
 
     // Configure Playwright crawler with anti-detection
-    const crawler = new Apify.PlaywrightCrawler({
+    const crawler = new PlaywrightCrawler({
         requestQueue,
         maxConcurrency: Math.min(maxConcurrency, 2), // Strict low concurrency for LinkedIn
         maxRequestRetries: 5,
@@ -270,7 +270,7 @@ const Apify = require('apify');
         navigationTimeoutSecs: 30,
 
         // Proxy configuration - use residential proxies for production
-        proxyConfiguration: await Apify.createProxyConfiguration(proxyConfiguration),
+        proxyConfiguration: await Actor.createProxyConfiguration(proxyConfiguration),
 
         // Launch context with anti-detection measures
         launchContext: {
@@ -408,4 +408,4 @@ const Apify = require('apify');
         await kvStore.setValue('fatal-error', stats);
         throw error;
     }
-})();
+});
