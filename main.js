@@ -1,7 +1,7 @@
 const Apify = require('apify');
 
 // Production-ready LinkedIn scraper with anti-detection measures
-Apify.main(async () => {
+(async () => {
     const { log } = Apify.utils;
     const input = await Apify.getInput();
     
@@ -407,4 +407,4 @@ Apify.main(async () => {
         await kvStore.setValue('fatal-error', stats);
         throw error;
     }
-});
+})();
