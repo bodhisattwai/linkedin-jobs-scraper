@@ -1,9 +1,9 @@
 {
-  "actorSpecification": 1,
+  "actorSpecification": 2,
   "name": "linkedin-jobs-scraper",
-  "title": "LinkedIn Jobs Scraper",
-  "description": "Advanced scraper for LinkedIn job listings with detailed job information extraction",
-  "version": "1.0.0",
+  "title": "LinkedIn Jobs Scraper - Advanced Edition",
+  "description": "Production-ready actor for scraping comprehensive job listings from LinkedIn including detailed job information and hiring team/recruiter details. Features anti-detection measures, residential proxy support, and hiring manager extraction.",
+  "version": "2.0.0",
   "meta": {
     "templateId": "js-cheerio-crawler"
   },
