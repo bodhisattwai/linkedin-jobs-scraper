@@ -5,7 +5,7 @@ const { PlaywrightCrawler, createPlaywrightRouter, log } = require('crawlee');
 Actor.main(async () => {
     // Initialize Apify SDK by getting input first
     const input = await Actor.getInput();
-    
+
     // Configuration with defaults
     const {
         searchQueries = ['Software Engineer'],
@@ -20,12 +20,12 @@ Actor.main(async () => {
         maxDelayBetweenRequests = 5000,
         debugMode = false,
     } = input || {};
-    
+
     // Input validation
     if (!searchQueries || searchQueries.length === 0) {
         throw new Error('searchQueries parameter must be provided and non-empty');
     }
-    
+
     if (!location || location.trim().length === 0) {
         throw new Error('location parameter must be provided and non-empty');
     }
@@ -34,7 +34,7 @@ Actor.main(async () => {
     const requestQueue = await Actor.openRequestQueue();
     const dataset = await Actor.openDataset();
     const kvStore = await Actor.openKeyValueStore();
-    
+
     // Track statistics
     const stats = {
         startTime: new Date(),
@@ -88,7 +88,7 @@ Actor.main(async () => {
     // Search results handler
     router.addHandler('SEARCH', async ({ page, request, enqueueLinks }) => {
         log.info(`[SEARCH] Processing: ${request.url}`);
-        
+
         try {
             // Wait for search results to load
             await page.waitForSelector('.base-card', { timeout: 15000 }).catch(() => {
@@ -184,14 +184,14 @@ Actor.main(async () => {
             // Extract hiring team information
             const hiringTeam = await page.evaluate(() => {
                 const team = [];
-                
+
                 // Primary method: Get from recruiter profile cards
                 const recruiterCards = document.querySelectorAll('[data-section-id="hiring_team"] [data-entity-index]');
                 recruiterCards.forEach(card => {
                     const nameElement = card.querySelector('[data-test*="entity-profile-title"]');
                     const titleElement = card.querySelector('[data-test*="entity-profile-subtitle"]');
                     const linkElement = card.querySelector('a[data-test*="profile-link"]');
-                    
+
                     team.push({
                         name: nameElement ? nameElement.textContent.trim() : 'Unknown',
                         title: titleElement ? titleElement.textContent.trim() : 'Unknown',
@@ -274,7 +274,7 @@ Actor.main(async () => {
 
         // Launch context with anti-detection measures
         launchContext: {
-            useChrome: true,
+            useChrome: false,
             launchOptions: {
                 headless: true,
                 // Disable headless mode signature
@@ -282,6 +282,8 @@ Actor.main(async () => {
                     '--disable-blink-features=AutomationControlled',
                     '--disable-web-resources',
                     '--disable-client-side-phishing-detection',
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
                 ],
             },
         },
@@ -293,7 +295,7 @@ Actor.main(async () => {
                 await randomDelay();
 
                 const page = context.page;
-                
+
                 // Add headers
                 await page.setExtraHTTPHeaders({
                     'User-Agent': getRandomUserAgent(),
@@ -310,7 +312,7 @@ Actor.main(async () => {
                 });
 
                 // Inject stealth scripts
-                await page.evaluateOnNewDocument(() => {
+                await page.addInitScript(() => {
                     Object.defineProperty(navigator, 'webdriver', {
                         get: () => false,
                     });
@@ -336,7 +338,7 @@ Actor.main(async () => {
         postNavigationHooks: [
             async (context) => {
                 const page = context.page;
-                
+
                 // Check for LinkedIn sign-in page (blocked)
                 const isSignInPage = await page.url().includes('/login');
                 if (isSignInPage) {
@@ -359,7 +361,7 @@ Actor.main(async () => {
             log.error(`❌ Request failed: ${request.url}`);
             log.error(`   Error: ${error.message}`);
             stats.errors++;
-            
+
             // Check if IP is blocked
             if (error.message.includes('sign-in') || error.message.includes('blocked')) {
                 stats.ipBlocked = true;
@@ -381,13 +383,13 @@ Actor.main(async () => {
         log.info(`   Queries: ${searchQueries.join(', ')}`);
         log.info(`   Location: ${location}`);
         log.info(`   Concurrency: ${Math.min(maxConcurrency, 2)}`);
-        
+
         await crawler.run();
 
         // Save statistics
         stats.endTime = new Date();
         stats.duration = stats.endTime - stats.startTime;
-        
+
         log.info(`
 ╔════════════════════════════════════════╗
 ║         SCRAPING COMPLETED            ║
