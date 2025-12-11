@@ -324,11 +324,28 @@ Actor.main(async () => {
                 // Add optional cookies if provided (e.g., LinkedIn session)
                 if (linkedinCookies) {
                     try {
-                        const cookies = JSON.parse(linkedinCookies);
+                        let cookies;
+
+                        // Handle both string and object inputs
+                        if (typeof linkedinCookies === 'string') {
+                            cookies = JSON.parse(linkedinCookies);
+                        } else {
+                            cookies = linkedinCookies;
+                        }
+
+                        // Validate cookies format
+                        if (!Array.isArray(cookies)) {
+                            throw new Error('Cookies must be an array');
+                        }
+
                         await page.context().addCookies(cookies);
-                        log.info('LinkedIn session cookies loaded');
+                        log.info(`LinkedIn session cookies loaded successfully (${cookies.length} cookies)`);
                     } catch (error) {
-                        log.warning('Failed to parse LinkedIn cookies');
+                        log.warning(`Failed to parse LinkedIn cookies: ${error.message}`);
+                        if (debugMode) {
+                            log.warning(`Cookie input type: ${typeof linkedinCookies}`);
+                            log.warning(`Cookie input value: ${JSON.stringify(linkedinCookies).substring(0, 200)}...`);
+                        }
                     }
                 }
             }
