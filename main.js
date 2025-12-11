@@ -206,6 +206,37 @@ Actor.main(async () => {
             });
             await new Promise(resolve => setTimeout(resolve, 1000));
 
+            // Debug: Test which selectors are working (only in debug mode)
+            if (debugMode) {
+                const selectorTest = await page.evaluate(() => {
+                    const testSelectors = (selectors, fieldName) => {
+                        for (const selector of selectors) {
+                            const el = document.querySelector(selector);
+                            if (el && el.textContent.trim()) {
+                                return { fieldName, selector, found: true, value: el.textContent.trim().substring(0, 50) };
+                            }
+                        }
+                        return { fieldName, found: false };
+                    };
+
+                    return {
+                        title: testSelectors([
+                            '[data-test="top-card-title"]',
+                            'h1.top-card-layout__title',
+                            'h1.t-24',
+                            '.job-details-jobs-unified-top-card__job-title h1'
+                        ], 'title'),
+                        company: testSelectors([
+                            'a[data-test="top-card-org-name-link"]',
+                            '.topcard__org-name-link',
+                            '.job-details-jobs-unified-top-card__company-name a',
+                            '.topcard__flavor--black-link'
+                        ], 'company'),
+                    };
+                });
+                log.info(`[DEBUG] Selector Test Results: ${JSON.stringify(selectorTest, null, 2)}`);
+            }
+
             // Extract basic job information
             const jobData = await page.evaluate(() => {
                 const getText = (selectors) => {
