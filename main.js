@@ -195,10 +195,21 @@ Actor.main(async () => {
         log.info(`[JOB_DETAIL] Processing: ${request.url}`);
 
         try {
-            // Wait for job details to load
-            await page.waitForSelector('[data-test="top-card-title"]', { timeout: 12000 }).catch(() => {
-                log.warning('Job title element not found');
-            });
+            // Wait for job details to load using Playwright's role-based selector
+            let jobTitle = '';
+            try {
+                // Try to get job title using role-based selector (most reliable)
+                const titleLocator = page.getByRole('heading', { level: 1 });
+                await titleLocator.first().waitFor({ timeout: 12000 });
+                jobTitle = await titleLocator.first().textContent();
+                log.info(`[JOB_DETAIL] Found title via role selector: ${jobTitle}`);
+            } catch (error) {
+                log.warning('Job title element not found via role selector, trying CSS fallbacks');
+                // Fallback to CSS selectors
+                await page.waitForSelector('h1', { timeout: 12000 }).catch(() => {
+                    log.warning('No h1 element found on page');
+                });
+            }
 
             // Scroll to load all content
             await page.evaluate(() => {
@@ -264,10 +275,11 @@ Actor.main(async () => {
 
                 return {
                     title: getText([
-                        '[data-test="top-card-title"]',
-                        'h1.top-card-layout__title',
+                        'h1',  // Most reliable - matches role="heading" level=1
                         'h1.t-24',
-                        '.job-details-jobs-unified-top-card__job-title h1'
+                        'h1.top-card-layout__title',
+                        '.job-details-jobs-unified-top-card__job-title h1',
+                        '[data-test="top-card-title"]'
                     ]),
                     company: getText([
                         'a[data-test="top-card-org-name-link"]',
