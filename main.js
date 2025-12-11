@@ -178,27 +178,79 @@ Actor.main(async () => {
 
             // Extract basic job information
             const jobData = await page.evaluate(() => {
-                const getText = (selector) => {
-                    const element = document.querySelector(selector);
-                    return element ? element.textContent.trim() : '';
+                const getText = (selectors) => {
+                    // Accept array of selectors and try each one
+                    const selectorArray = Array.isArray(selectors) ? selectors : [selectors];
+                    for (const selector of selectorArray) {
+                        const element = document.querySelector(selector);
+                        if (element && element.textContent.trim()) {
+                            return element.textContent.trim();
+                        }
+                    }
+                    return '';
                 };
 
-                const getAllText = (selector) => {
-                    const elements = document.querySelectorAll(selector);
-                    return Array.from(elements).map(el => el.textContent.trim()).filter(text => text.length > 0);
+                const getAllText = (selectors) => {
+                    const selectorArray = Array.isArray(selectors) ? selectors : [selectors];
+                    for (const selector of selectorArray) {
+                        const elements = document.querySelectorAll(selector);
+                        if (elements.length > 0) {
+                            return Array.from(elements).map(el => el.textContent.trim()).filter(text => text.length > 0);
+                        }
+                    }
+                    return [];
                 };
 
                 return {
-                    title: getText('[data-test="top-card-title"]'),
-                    company: getText('a[data-test="top-card-org-name-link"]'),
-                    location: getText('[data-test="top-card-location"]'),
-                    locationType: getText('[data-test="job-details-location-type-label"]'),
-                    seniority: getText('[data-test="job-criteria-seniority-level-skill-label"]'),
-                    employmentType: getText('[data-test="job-details-employment-type-label"]'),
-                    description: getText('[data-test="job-details-jobs-details__main-content"]'),
-                    salary: getText('[data-test="job-details-compensation-label"]'),
-                    criteria: getAllText('[data-test="job-details-job-criteria-item-subtitle"]'),
-                    postedDate: getText('span[aria-label*="ago"]'),
+                    title: getText([
+                        '[data-test="top-card-title"]',
+                        'h1.top-card-layout__title',
+                        'h1.t-24',
+                        '.job-details-jobs-unified-top-card__job-title h1'
+                    ]),
+                    company: getText([
+                        'a[data-test="top-card-org-name-link"]',
+                        '.topcard__org-name-link',
+                        '.job-details-jobs-unified-top-card__company-name a',
+                        '.topcard__flavor--black-link'
+                    ]),
+                    location: getText([
+                        '[data-test="top-card-location"]',
+                        '.topcard__flavor--bullet',
+                        '.job-details-jobs-unified-top-card__primary-description-container span'
+                    ]),
+                    locationType: getText([
+                        '[data-test="job-details-location-type-label"]',
+                        '.job-details-jobs-unified-top-card__workplace-type'
+                    ]),
+                    seniority: getText([
+                        '[data-test="job-criteria-seniority-level-skill-label"]',
+                        '.job-details-jobs-unified-top-card__job-insight span'
+                    ]),
+                    employmentType: getText([
+                        '[data-test="job-details-employment-type-label"]',
+                        '.job-details-jobs-unified-top-card__job-insight--highlight'
+                    ]),
+                    description: getText([
+                        '[data-test="job-details-jobs-details__main-content"]',
+                        '.jobs-description__content',
+                        '.show-more-less-html__markup',
+                        '#job-details'
+                    ]),
+                    salary: getText([
+                        '[data-test="job-details-compensation-label"]',
+                        '.job-details-jobs-unified-top-card__job-insight--highlight',
+                        '.compensation__salary'
+                    ]),
+                    criteria: getAllText([
+                        '[data-test="job-details-job-criteria-item-subtitle"]',
+                        '.job-criteria-item__text'
+                    ]),
+                    postedDate: getText([
+                        'span[aria-label*="ago"]',
+                        '.jobs-unified-top-card__posted-date',
+                        '.topcard__flavor--metadata'
+                    ]),
                 };
             });
 
