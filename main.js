@@ -121,16 +121,54 @@ Actor.main(async () => {
                 }
             }
 
-            // Extract and enqueue job detail URLs
-            await enqueueLinks({
-                selector: 'a.base-card__full-link',
-                userData: {
-                    label: 'JOB_DETAIL',
-                    searchQuery: request.userData.query,
-                    location: request.userData.location,
-                },
-                requestQueue,
+            // Extract job detail URLs with multiple fallback selectors
+            const jobLinks = await page.evaluate(() => {
+                const links = [];
+
+                // Try multiple selectors for job links
+                const selectors = [
+                    'a.base-card__full-link',
+                    '.job-card-container__link',
+                    '.jobs-search-results__list-item a[href*="/jobs/view/"]',
+                    'a[data-tracking-control-name="public_jobs_jserp-result_search-card"]',
+                    '.base-search-card__title',
+                    'a.base-card__link',
+                ];
+
+                for (const selector of selectors) {
+                    const elements = document.querySelectorAll(selector);
+                    if (elements.length > 0) {
+                        elements.forEach(el => {
+                            const href = el.href || el.getAttribute('href');
+                            if (href && href.includes('/jobs/view/')) {
+                                links.push(href);
+                            }
+                        });
+                        if (links.length > 0) {
+                            break; // Found links with this selector, stop trying others
+                        }
+                    }
+                }
+
+                return [...new Set(links)]; // Remove duplicates
             });
+
+            log.info(`[SEARCH] Extracted ${jobLinks.length} job URLs`);
+            if (jobLinks.length > 0) {
+                log.info(`[SEARCH] Sample URLs: ${jobLinks.slice(0, 3).join(', ')}`);
+            }
+
+            // Enqueue job detail URLs
+            for (const url of jobLinks) {
+                await requestQueue.addRequest({
+                    url,
+                    userData: {
+                        label: 'JOB_DETAIL',
+                        searchQuery: request.userData.query,
+                        location: request.userData.location,
+                    },
+                });
+            }
 
             // Handle pagination
             const hasNextPage = await page.$('a[aria-label="View next page"]') !== null;
