@@ -266,8 +266,8 @@ Actor.main(async () => {
         requestQueue,
         maxConcurrency: Math.min(maxConcurrency, 2), // Strict low concurrency for LinkedIn
         maxRequestRetries: 5,
-        requestHandlerTimeoutSecs: 60,
-        navigationTimeoutSecs: 30,
+        requestHandlerTimeoutSecs: 90,
+        navigationTimeoutSecs: 60,
 
         // Proxy configuration - use residential proxies for production
         proxyConfiguration: await Actor.createProxyConfiguration(proxyConfiguration),
