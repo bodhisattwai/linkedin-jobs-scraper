@@ -1,9 +1,0 @@
-{
-	"id": "RjpWaX1liNfn8ev",
-	"json": "{\"id\":\"RjpWaX1liNfn8ev\",\"url\":\"https://www.linkedin.com/jobs/search/?keywords=Senior%20Software%20Engineer&location=United%20States&start=0\",\"uniqueKey\":\"https://www.linkedin.com/jobs/search?keywords=Senior+Software+Engineer&location=United+States&start=0\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"label\":\"SEARCH\",\"query\":\"Senior Software Engineer\",\"location\":\"United States\",\"retryCount\":0}}",
-	"method": "GET",
-	"orderNo": 1763954807880,
-	"retryCount": 0,
-	"uniqueKey": "https://www.linkedin.com/jobs/search?keywords=Senior+Software+Engineer&location=United+States&start=0",
-	"url": "https://www.linkedin.com/jobs/search/?keywords=Senior%20Software%20Engineer&location=United%20States&start=0"
-}

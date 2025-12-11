@@ -8,8 +8,7 @@ Actor.main(async () => {
 
     // Configuration with defaults
     const {
-        searchQueries = ['Software Engineer'],
-        location = 'United States',
+        searchUrl = [],
         maxResults = 100,
         maxConcurrency = 2, // LinkedIn requires low concurrency
         proxyConfiguration = { useApifyProxy: true },
@@ -22,12 +21,15 @@ Actor.main(async () => {
     } = input || {};
 
     // Input validation
-    if (!searchQueries || searchQueries.length === 0) {
-        throw new Error('searchQueries parameter must be provided and non-empty');
+    if (!searchUrl || searchUrl.length === 0) {
+        throw new Error('searchUrl parameter must be provided and non-empty. Please provide LinkedIn job search URLs.');
     }
 
-    if (!location || location.trim().length === 0) {
-        throw new Error('location parameter must be provided and non-empty');
+    // Validate URLs
+    for (const url of searchUrl) {
+        if (!url.includes('linkedin.com/jobs')) {
+            throw new Error(`Invalid URL: ${url}. Must be a LinkedIn jobs search URL.`);
+        }
     }
 
     // Request queue and dataset
@@ -61,21 +63,13 @@ Actor.main(async () => {
 
     const getRandomUserAgent = () => userAgents[Math.floor(Math.random() * userAgents.length)];
 
-    // Prepare search URLs
-    const searchUrls = searchQueries.map(query => {
-        const encodedQuery = encodeURIComponent(query);
-        const encodedLocation = encodeURIComponent(location);
-        return `https://www.linkedin.com/jobs/search/?keywords=${encodedQuery}&location=${encodedLocation}&start=0`;
-    });
-
     // Add initial search URLs to queue
-    for (const url of searchUrls) {
+    for (const url of searchUrl) {
         await requestQueue.addRequest({
             url,
             userData: {
                 label: 'SEARCH',
-                query: searchQueries[searchUrls.indexOf(url)],
-                location,
+                searchUrl: url,
                 retryCount: 0,
             },
             retryCount: 0,
@@ -164,8 +158,7 @@ Actor.main(async () => {
                     url,
                     userData: {
                         label: 'JOB_DETAIL',
-                        searchQuery: request.userData.query,
-                        location: request.userData.location,
+                        searchUrl: request.userData.searchUrl,
                     },
                 });
             }
@@ -183,8 +176,7 @@ Actor.main(async () => {
                         url: nextPageUrl,
                         userData: {
                             label: 'SEARCH',
-                            query: request.userData.query,
-                            location: request.userData.location,
+                            searchUrl: request.userData.searchUrl,
                             retryCount: 0,
                         },
                     });
@@ -342,8 +334,7 @@ Actor.main(async () => {
                 jobCriteria: jobData.criteria,
                 postedDate: jobData.postedDate || 'Not specified',
                 hiringTeam: hiringTeam,
-                searchQuery: request.userData.searchQuery,
-                location_filter: request.userData.location,
+                searchUrl: request.userData.searchUrl,
                 scrapedAt: new Date().toISOString(),
                 customData: customData,
             };
@@ -542,8 +533,10 @@ Actor.main(async () => {
 
     try {
         log.info('🚀 Starting LinkedIn Jobs Scraper (Production Mode)');
-        log.info(`   Queries: ${searchQueries.join(', ')}`);
-        log.info(`   Location: ${location}`);
+        log.info(`   Search URLs: ${searchUrl.length}`);
+        searchUrl.forEach((url, index) => {
+            log.info(`   [${index + 1}] ${url}`);
+        });
         log.info(`   Concurrency: ${Math.min(maxConcurrency, 2)}`);
 
         await crawler.run();

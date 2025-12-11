@@ -1,0 +1,52 @@
+{
+  "requestsFinished": 0,
+  "requestsFailed": 1,
+  "requestsRetries": 1,
+  "requestsFailedPerMinute": 2,
+  "requestsFinishedPerMinute": 0,
+  "requestMinDurationMillis": null,
+  "requestMaxDurationMillis": 0,
+  "requestTotalFailedDurationMillis": 4387,
+  "requestTotalFinishedDurationMillis": 0,
+  "crawlerStartedAt": "2025-11-24T05:13:38.743Z",
+  "crawlerFinishedAt": "2025-11-24T05:14:05.277Z",
+  "statsPersistedAt": "2025-11-24T05:14:05.277Z",
+  "crawlerRuntimeMillis": 26621,
+  "crawlerLastStartTimestamp": 1763961218656,
+  "requestRetryHistogram": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    1
+  ],
+  "statsId": 0,
+  "requestAvgFailedDurationMillis": 4387,
+  "requestAvgFinishedDurationMillis": null,
+  "requestTotalDurationMillis": 4387,
+  "requestsTotal": 1,
+  "requestsWithStatusCode": {},
+  "errors": {
+    "C:\\Users\\user\\Desktop\\linkedin-jobs-scraper\\main.js:313:28": {
+      "missing error code": {
+        "TypeError": {
+          "page.evaluateOnNewDocument is not a function": {
+            "count": 1
+          }
+        }
+      }
+    }
+  },
+  "retryErrors": {
+    "C:\\Users\\user\\Desktop\\linkedin-jobs-scraper\\main.js:313:28": {
+      "missing error code": {
+        "TypeError": {
+          "page.evaluateOnNewDocument is not a function": {
+            "count": 5
+          }
+        }
+      }
+    }
+  }
+}

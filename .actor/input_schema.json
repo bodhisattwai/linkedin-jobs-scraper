@@ -3,21 +3,17 @@
   "type": "object",
   "schemaVersion": 1,
   "properties": {
-    "searchQueries": {
-      "title": "Search Queries",
+    "searchUrl": {
+      "title": "LinkedIn Job Search URLs",
       "type": "array",
-      "description": "List of job titles or keywords to search for",
+      "description": "Full LinkedIn job search URLs with all filters applied. Go to LinkedIn jobs search, apply your filters, then copy the URL from the address bar.",
       "editor": "stringList",
-      "prefill": ["Software Engineer", "Data Scientist"],
-      "default": ["Software Engineer"]
-    },
-    "location": {
-      "title": "Location",
-      "type": "string",
-      "description": "Location to search jobs in (country, city, or region)",
-      "editor": "textfield",
-      "prefill": "United States",
-      "default": "United States"
+      "prefill": [
+        "https://www.linkedin.com/jobs/search/?keywords=Software%20Engineer&location=United%20States"
+      ],
+      "example": [
+        "https://www.linkedin.com/jobs/search/?keywords=Vendor%20Manager&location=United%20States&f_E=3,4&f_JT=F"
+      ]
     },
     "maxResults": {
       "title": "Maximum Results",
@@ -90,5 +86,7 @@
       "default": false
     }
   },
-  "required": ["searchQueries", "location"]
+  "required": [
+    "searchUrl"
+  ]
 }
