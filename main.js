@@ -338,8 +338,30 @@ Actor.main(async () => {
                             throw new Error('Cookies must be an array');
                         }
 
-                        await page.context().addCookies(cookies);
-                        log.info(`LinkedIn session cookies loaded successfully (${cookies.length} cookies)`);
+                        // Normalize cookies to Playwright format
+                        const normalizedCookies = cookies.map(cookie => {
+                            const normalized = {
+                                name: cookie.name,
+                                value: cookie.value,
+                                domain: cookie.domain,
+                                path: cookie.path || '/',
+                                httpOnly: cookie.httpOnly || false,
+                                secure: cookie.secure !== undefined ? cookie.secure : true,
+                                sameSite: cookie.sameSite || 'Lax', // Default to Lax if not specified
+                            };
+
+                            // Convert expirationDate to expires (Unix timestamp)
+                            if (cookie.expirationDate) {
+                                normalized.expires = Math.floor(cookie.expirationDate);
+                            } else if (cookie.expires) {
+                                normalized.expires = cookie.expires;
+                            }
+
+                            return normalized;
+                        });
+
+                        await page.context().addCookies(normalizedCookies);
+                        log.info(`LinkedIn session cookies loaded successfully (${normalizedCookies.length} cookies)`);
                     } catch (error) {
                         log.warning(`Failed to parse LinkedIn cookies: ${error.message}`);
                         if (debugMode) {
