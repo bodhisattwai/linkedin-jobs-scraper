@@ -340,6 +340,18 @@ Actor.main(async () => {
 
                         // Normalize cookies to Playwright format
                         const normalizedCookies = cookies.map(cookie => {
+                            // Convert sameSite values
+                            let sameSite = 'Lax'; // Default
+                            if (cookie.sameSite === 'no_restriction') {
+                                sameSite = 'None';
+                            } else if (cookie.sameSite === 'lax' || cookie.sameSite === 'Lax') {
+                                sameSite = 'Lax';
+                            } else if (cookie.sameSite === 'strict' || cookie.sameSite === 'Strict') {
+                                sameSite = 'Strict';
+                            } else if (cookie.sameSite === 'None') {
+                                sameSite = 'None';
+                            }
+
                             const normalized = {
                                 name: cookie.name,
                                 value: cookie.value,
@@ -347,7 +359,7 @@ Actor.main(async () => {
                                 path: cookie.path || '/',
                                 httpOnly: cookie.httpOnly || false,
                                 secure: cookie.secure !== undefined ? cookie.secure : true,
-                                sameSite: cookie.sameSite || 'Lax', // Default to Lax if not specified
+                                sameSite: sameSite,
                             };
 
                             // Convert expirationDate to expires (Unix timestamp)
