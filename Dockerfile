@@ -8,8 +8,7 @@ COPY package*.json ./
 # Install dependencies
 # Using --only=prod to exclude devDependencies for smaller image size
 RUN npm --quiet set progress=false \
-    && npm install --only=prod --no-optional \
-    && npx playwright install --with-deps chromium
+    && npm install --only=prod --no-optional
 
 # Copy the source code
 COPY . ./
