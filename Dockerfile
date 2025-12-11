@@ -1,6 +1,6 @@
-# Use the official Apify actor image with Playwright Chromium support
-# This image includes Node.js, Playwright, and Chromium browser
-FROM apify/actor-node-playwright-chromium:20
+# Use the official Apify actor image with Playwright Chrome support
+# This image includes Node.js, Playwright, and Chrome browser
+FROM apify/actor-node-playwright-chrome:20
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
