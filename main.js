@@ -100,6 +100,27 @@ Actor.main(async () => {
             stats.jobsFound += jobCount;
             log.info(`[SEARCH] Found ${jobCount} job listings on this page`);
 
+            // Debug: If no jobs found, capture page info
+            if (jobCount === 0) {
+                const pageInfo = await page.evaluate(() => {
+                    return {
+                        title: document.title,
+                        url: window.location.href,
+                        bodyText: document.body.innerText.substring(0, 500),
+                        hasLoginForm: !!document.querySelector('form[data-id="sign-in-form"]'),
+                        hasChallengeForm: !!document.querySelector('[data-test-id="challenge"]'),
+                        hasJobsContainer: !!document.querySelector('.jobs-search__results-list'),
+                    };
+                });
+                log.warning(`[DEBUG] Page Info: ${JSON.stringify(pageInfo, null, 2)}`);
+
+                // Take screenshot for debugging
+                if (debugMode) {
+                    const screenshot = await page.screenshot({ fullPage: false });
+                    await Actor.setValue('blocked-page-screenshot', screenshot, { contentType: 'image/png' });
+                }
+            }
+
             // Extract and enqueue job detail URLs
             await enqueueLinks({
                 selector: 'a.base-card__full-link',
