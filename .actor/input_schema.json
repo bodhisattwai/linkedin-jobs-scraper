@@ -64,6 +64,34 @@
       "description": "JSON-formatted LinkedIn session cookies for authenticated scraping",
       "editor": "textarea"
     },
+    "customUserAgent": {
+      "title": "Custom User Agent (Optional)",
+      "type": "string",
+      "description": "Custom user agent string. Leave empty to use random realistic user agents.",
+      "editor": "textfield",
+      "example": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36..."
+    },
+    "detailedScraping": {
+      "title": "Scrape More Details (Slower)",
+      "type": "boolean",
+      "description": "Enable detailed scraping including skills, company info, and additional job details. This will slow down the scraper but provide more comprehensive data.",
+      "editor": "checkbox",
+      "default": false
+    },
+    "scrapeSkills": {
+      "title": "Scrape Skills Requirements",
+      "type": "boolean",
+      "description": "Extract required skills from job descriptions. Only works when 'Scrape More Details' is enabled.",
+      "editor": "checkbox",
+      "default": false
+    },
+    "scrapeCompanyDetails": {
+      "title": "Scrape Company Details",
+      "type": "boolean",
+      "description": "Extract company information (size, industry, description). Only works when 'Scrape More Details' is enabled.",
+      "editor": "checkbox",
+      "default": false
+    },
     "extendOutputFunction": {
       "title": "Custom Output Function",
       "type": "string",

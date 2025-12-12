@@ -15,6 +15,10 @@ Actor.main(async () => {
         extendOutputFunction = null,
         customData = {},
         linkedinCookies = null, // Optional: LinkedIn session cookies
+        customUserAgent = null, // Optional: Custom user agent
+        detailedScraping = false, // Optional: Enable detailed scraping (slower)
+        scrapeSkills = false, // Optional: Extract skills from job description
+        scrapeCompanyDetails = false, // Optional: Extract company information
         minDelayBetweenRequests = 1000, // Milliseconds - reduced for faster scraping
         maxDelayBetweenRequests = 2000, // Milliseconds - reduced for faster scraping
         debugMode = false,
@@ -61,7 +65,7 @@ Actor.main(async () => {
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15',
     ];
 
-    const getRandomUserAgent = () => userAgents[Math.floor(Math.random() * userAgents.length)];
+    const getRandomUserAgent = () => customUserAgent || userAgents[Math.floor(Math.random() * userAgents.length)];
 
     // Add initial search URLs to queue
     for (const url of searchUrl) {
@@ -369,6 +373,42 @@ Actor.main(async () => {
                 return team;
             });
 
+            // Optional: Extract skills if enabled
+            let skills = [];
+            if (detailedScraping && scrapeSkills) {
+                skills = await page.evaluate(() => {
+                    const description = document.querySelector('#job-details')?.textContent || '';
+                    const skillKeywords = [
+                        'Python', 'JavaScript', 'Java', 'C++', 'SQL', 'R', 'Scala', 'Go', 'Ruby', 'PHP',
+                        'React', 'Angular', 'Vue', 'Node.js', 'Django', 'Flask', 'Spring', 'Express',
+                        'AWS', 'Azure', 'GCP', 'Docker', 'Kubernetes', 'Jenkins', 'Git', 'CI/CD',
+                        'Machine Learning', 'Deep Learning', 'NLP', 'Computer Vision', 'TensorFlow', 'PyTorch',
+                        'Data Analysis', 'Statistics', 'Excel', 'Tableau', 'Power BI', 'Looker',
+                        'Agile', 'Scrum', 'JIRA', 'Confluence', 'REST API', 'GraphQL', 'MongoDB', 'PostgreSQL'
+                    ];
+
+                    const foundSkills = skillKeywords.filter(skill =>
+                        description.toLowerCase().includes(skill.toLowerCase())
+                    );
+
+                    return [...new Set(foundSkills)]; // Remove duplicates
+                });
+                log.info(`[JOB_DETAIL] Found ${skills.length} skills`);
+            }
+
+            // Optional: Extract company details if enabled
+            let companyDetails = {};
+            if (detailedScraping && scrapeCompanyDetails) {
+                companyDetails = await page.evaluate(() => {
+                    return {
+                        size: document.querySelector('.job-details-jobs-unified-top-card__job-insight')?.textContent.trim() || 'Not specified',
+                        industry: document.querySelector('.job-details-jobs-unified-top-card__job-insight--highlight')?.textContent.trim() || 'Not specified',
+                        description: document.querySelector('.job-details-jobs-unified-top-card__company-name')?.getAttribute('title') || 'Not specified'
+                    };
+                });
+                log.info(`[JOB_DETAIL] Extracted company details for ${jobData.company}`);
+            }
+
             // Compile complete job record
             const job = {
                 url: request.url,
@@ -387,6 +427,14 @@ Actor.main(async () => {
                 scrapedAt: new Date().toISOString(),
                 customData: customData,
             };
+
+            // Add optional fields if enabled
+            if (detailedScraping && scrapeSkills && skills.length > 0) {
+                job.skills = skills;
+            }
+            if (detailedScraping && scrapeCompanyDetails) {
+                job.companyDetails = companyDetails;
+            }
 
             // Apply custom extension function if provided
             if (extendOutputFunction) {
