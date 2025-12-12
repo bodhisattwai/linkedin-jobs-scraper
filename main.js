@@ -15,8 +15,8 @@ Actor.main(async () => {
         extendOutputFunction = null,
         customData = {},
         linkedinCookies = null, // Optional: LinkedIn session cookies
-        minDelayBetweenRequests = 2000, // Milliseconds
-        maxDelayBetweenRequests = 5000,
+        minDelayBetweenRequests = 1000, // Milliseconds - reduced for faster scraping
+        maxDelayBetweenRequests = 2000, // Milliseconds - reduced for faster scraping
         debugMode = false,
     } = input || {};
 
