@@ -276,39 +276,45 @@ Actor.main(async () => {
                 return {
                     title: getText([
                         'h1',  // Most reliable - matches role="heading" level=1
+                        'a[href*="/jobs/view/"]',  // Job title link
                         'h1.t-24',
                         'h1.top-card-layout__title',
                         '.job-details-jobs-unified-top-card__job-title h1',
                         '[data-test="top-card-title"]'
                     ]),
                     company: getText([
+                        '.job-details-jobs-unified-top-card__company-name a',  // User-provided selector
                         'a[data-test="top-card-org-name-link"]',
                         '.topcard__org-name-link',
-                        '.job-details-jobs-unified-top-card__company-name a',
                         '.topcard__flavor--black-link'
                     ]),
                     location: getText([
+                        'div.job-details-jobs-unified-top-card__primary-description-container span',  // User-provided
                         '[data-test="top-card-location"]',
                         '.topcard__flavor--bullet',
-                        '.job-details-jobs-unified-top-card__primary-description-container span'
+                        '.job-details-jobs-unified-top-card__primary-description-container'
                     ]),
                     locationType: getText([
+                        'div.t-black--light.mt2.job-details-jobs-unified-top-card__tertiary-description-container',  // User-provided
                         '[data-test="job-details-location-type-label"]',
                         '.job-details-jobs-unified-top-card__workplace-type'
                     ]),
                     seniority: getText([
+                        'div.t-black--light.mt2.job-details-jobs-unified-top-card__tertiary-description-container',  // User-provided
                         '[data-test="job-criteria-seniority-level-skill-label"]',
                         '.job-details-jobs-unified-top-card__job-insight span'
                     ]),
                     employmentType: getText([
+                        'div.t-black--light.mt2.job-details-jobs-unified-top-card__tertiary-description-container',  // User-provided
                         '[data-test="job-details-employment-type-label"]',
                         '.job-details-jobs-unified-top-card__job-insight--highlight'
                     ]),
                     description: getText([
-                        '[data-test="job-details-jobs-details__main-content"]',
+                        "div#job-details",  // User-provided - main job details container
+                        "p[dir='ltr']",  // User-provided - description paragraphs
                         '.jobs-description__content',
-                        '.show-more-less-html__markup',
-                        '#job-details'
+                        '[data-test="job-details-jobs-details__main-content"]',
+                        '.show-more-less-html__markup'
                     ]),
                     salary: getText([
                         '[data-test="job-details-compensation-label"]',
