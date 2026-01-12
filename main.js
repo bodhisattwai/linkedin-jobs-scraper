@@ -279,6 +279,7 @@ Actor.main(async () => {
 
                 return {
                     title: getText([
+                        'h1.t-24 a', // Based on recent user screenshot
                         'h1',  // Most reliable - matches role="heading" level=1
                         'a[href*="/jobs/view/"]',  // Job title link
                         'h1.t-24',
@@ -314,6 +315,7 @@ Actor.main(async () => {
                         '.job-details-jobs-unified-top-card__job-insight--highlight'
                     ]),
                     description: getText([
+                        '.jobs-box__html-content', // User provided parent selector
                         "div#job-details",  // User-provided - main job details container
                         "p[dir='ltr']",  // User-provided - description paragraphs
                         '.jobs-description__content',
@@ -334,6 +336,16 @@ Actor.main(async () => {
                         '.jobs-unified-top-card__posted-date',
                         '.topcard__flavor--metadata'
                     ]),
+                    // New fields based on selectors.txt
+                    aboutCompany: getText([
+                        '.jobs-company__box', // User provided parent selector
+                        '.jobs-company__content',
+                        '#company-description'
+                    ]),
+                    isEasyApply: getText([
+                        'div.jobs-s-apply button',
+                        '.jobs-apply-button--top-card button'
+                    ]) ? true : false,
                 };
             });
 
@@ -355,7 +367,45 @@ Actor.main(async () => {
                     });
                 });
 
-                // Fallback: Try alternative selectors
+                // Fallback 1: Try user-provided selector structure
+                if (team.length === 0) {
+                    // Look for the specific container user found
+                    const peopleSection = document.querySelector('.job-details-people-who-can-help_section--two-pane');
+                    if (peopleSection) {
+                        const link = peopleSection.querySelector('a[href*="/in/"]'); // Find profile link
+                        const img = peopleSection.querySelector('img'); // often has name in alt text
+
+                        if (link) {
+                            const rawName = link.textContent.trim() || (img ? img.alt : 'Recruiter');
+                            // Clean up name (remove "Status is online", "2nd degree connection", etc)
+                            const name = rawName.split('\n')[0].trim();
+
+                            team.push({
+                                name: name,
+                                profileUrl: link.href,
+                                title: 'Recruiter (Extracted via Fallback)',
+                            });
+                        }
+                    }
+                }
+
+                // Fallback 2: Try user-provided parent selector (Generic Utility Classes)
+                if (team.length === 0) {
+                    const genericSection = document.querySelector('.display-flex.align-items-center.mt4');
+                    // Ensure it's likely the right section by checking content or proximity
+                    if (genericSection && genericSection.innerText.includes('Hiring team')) {
+                        const link = genericSection.querySelector('a[href*="/in/"]');
+                        if (link) {
+                            team.push({
+                                name: link.textContent.trim(),
+                                profileUrl: link.href,
+                                title: 'Recruiter (Extracted via Generic Parent)',
+                            });
+                        }
+                    }
+                }
+
+                // Fallback 3: General list items
                 if (team.length === 0) {
                     const alternateCards = document.querySelectorAll('[data-section-id="hiring_team"] li');
                     alternateCards.forEach(card => {
@@ -412,7 +462,7 @@ Actor.main(async () => {
             // Compile complete job record
             const job = {
                 url: request.url,
-                title: jobData.title || 'Not specified',
+                Jobtitle: jobData.title || 'Not specified',
                 company: jobData.company || 'Not specified',
                 location: jobData.location || 'Not specified',
                 locationType: jobData.locationType || 'Not specified',
@@ -423,6 +473,8 @@ Actor.main(async () => {
                 jobCriteria: jobData.criteria,
                 postedDate: jobData.postedDate || 'Not specified',
                 hiringTeam: hiringTeam,
+                aboutCompany: jobData.aboutCompany || 'Not specified',
+                isEasyApply: jobData.isEasyApply,
                 searchUrl: request.userData.searchUrl,
                 scrapedAt: new Date().toISOString(),
                 customData: customData,
@@ -451,7 +503,7 @@ Actor.main(async () => {
             }
 
             stats.jobsScraped++;
-            log.info(`[JOB_DETAIL] ✓ Scraped: ${job.title} at ${job.company}`);
+            log.info(`[JOB_DETAIL] ✓ Scraped: ${job.Jobtitle} at ${job.company}`);
 
         } catch (error) {
             log.error(`[JOB_DETAIL] Error scraping job details: ${error.message}`);
