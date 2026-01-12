@@ -273,6 +273,25 @@ Actor.main(async () => {
                     return [];
                 };
 
+                // Smart extraction for Location Type and Employment Type from tags
+                let extractedLocationType = '';
+                let extractedEmploymentType = '';
+
+                const preferenceTags = document.querySelectorAll('.job-details-fit-level-preferences .tvm__text--low-emphasis strong');
+                preferenceTags.forEach(tag => {
+                    const text = tag.textContent.trim();
+                    const lowerText = text.toLowerCase();
+
+                    // Check for Location Type keywords
+                    if (['remote', 'on-site', 'hybrid'].some(type => lowerText.includes(type))) {
+                        extractedLocationType = text;
+                    }
+                    // Check for Employment Type keywords
+                    else if (['full-time', 'part-time', 'contract', 'temporary', 'internship'].some(type => lowerText.includes(type))) {
+                        extractedEmploymentType = text;
+                    }
+                });
+
                 return {
                     title: getText([
                         'h1.t-24 a', // Based on recent user screenshot
@@ -295,7 +314,7 @@ Actor.main(async () => {
                         '.topcard__flavor--bullet',
                         '.job-details-jobs-unified-top-card__primary-description-container'
                     ]),
-                    locationType: getText([
+                    locationType: extractedLocationType || getText([
                         'div.t-black--light.mt2.job-details-jobs-unified-top-card__tertiary-description-container',  // User-provided
                         '[data-test="job-details-location-type-label"]',
                         '.job-details-jobs-unified-top-card__workplace-type'
@@ -305,7 +324,7 @@ Actor.main(async () => {
                         '[data-test="job-criteria-seniority-level-skill-label"]',
                         '.job-details-jobs-unified-top-card__job-insight span'
                     ]),
-                    employmentType: getText([
+                    employmentType: extractedEmploymentType || getText([
                         'div.t-black--light.mt2.job-details-jobs-unified-top-card__tertiary-description-container',  // User-provided
                         '[data-test="job-details-employment-type-label"]',
                         '.job-details-jobs-unified-top-card__job-insight--highlight'
@@ -385,23 +404,44 @@ Actor.main(async () => {
                     }
                 }
 
-                // Fallback 2: Try user-provided parent selector (Generic Utility Classes)
+                // Fallback 2: Specific Hirer Card (Based on User Screenshot)
                 if (team.length === 0) {
-                    const genericSection = document.querySelector('.display-flex.align-items-center.mt4');
-                    // Ensure it's likely the right section by checking content or proximity
-                    if (genericSection && genericSection.innerText.includes('Hiring team')) {
-                        const link = genericSection.querySelector('a[href*="/in/"]');
-                        if (link) {
+                    const hirerInfo = document.querySelector('.hirer-card__hirer-information');
+                    if (hirerInfo) {
+                        const link = hirerInfo.querySelector('a');
+                        const nameElement = hirerInfo.querySelector('strong') || hirerInfo.querySelector('.jobs-poster__name');
+
+                        if (link && nameElement) {
                             team.push({
-                                name: link.textContent.trim(),
+                                name: nameElement.textContent.trim(),
                                 profileUrl: link.href,
-                                title: 'Recruiter (Extracted via Generic Parent)',
+                                title: 'Recruiter (Extracted via Hirer Card)',
                             });
                         }
                     }
                 }
 
-                // Fallback 3: General list items
+                // Fallback 3: Generic Parent with "Hiring team" text check (Broadest safety net)
+                if (team.length === 0) {
+                    const sections = document.querySelectorAll('.artdeco-card');
+                    for (const section of sections) {
+                        if (section.innerText.toLowerCase().includes('hiring team')) {
+                            const link = section.querySelector('a[href*="/in/"]');
+                            if (link) {
+                                // Try to find a name near the link
+                                const name = link.textContent.trim() || 'Recruiter';
+                                team.push({
+                                    name: name,
+                                    profileUrl: link.href,
+                                    title: 'Recruiter (Extracted via Section Text)',
+                                });
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Fallback 4: General list items
                 if (team.length === 0) {
                     const alternateCards = document.querySelectorAll('[data-section-id="hiring_team"] li');
                     alternateCards.forEach(card => {
